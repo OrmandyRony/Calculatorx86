@@ -1,6 +1,6 @@
 include macros.asm
 .model small
-.stack 400h
+.stack
 .data
     ; Opciones de menu
     options      db 'Ingrese el  de opcion que desee:',13,10
@@ -21,52 +21,43 @@ include macros.asm
     coeficiente5 db 0d
     coeficiente6 db 0d
 
-    signo1 db 0d  ; define la variable signo como un carácter (1 byte)
-    signo2 db 0d  ; define la variable signo como un carácter (1 byte)
-    signo3 db 0d  ; define la variable signo como un carácter (1 byte)
-    signo4 db 0d  ; define la variable signo como un carácter (1 byte)
-    signo5 db 0d  ; define la variable signo como un carácter (1 byte)
-    signo6 db 0d  ; define la variable signo como un carácter (1 byte)
+    signo1 db 0d  ; varoable de apoyo para el control de su signo
+    signo2 db 0d  ; varoable de apoyo para el control de su signo
+    signo3 db 0d  ; varoable de apoyo para el control de su signo
+    signo4 db 0d  ; varoable de apoyo para el control de su signo
+    signo5 db 0d  ; varoable de apoyo para el control de su signo
+    signo6 db 0d  ; varoable de apoyo para el control de su signo
 
-    derivada1 db 0d  ;variables para almacenar el contenido de la derivada
-    derivada2 db 0d
-    derivada3 db 0d
-    derivada4 db 0d
-    derivada5 db 0d
+    derivada1 db 0d  ;variable para almacenar la derivada de su respectivo coeficiente
+    derivada2 db 0d  ;variable para almacenar la derivada de su respectivo coeficiente
+    derivada3 db 0d  ;variable para almacenar la derivada de su respectivo coeficiente
+    derivada4 db 0d  ;variable para almacenar la derivada de su respectivo coeficiente
+    derivada5 db 0d  ;variable para almacenar la derivada de su respectivo coeficiente
 
-    valInt1 db 0d   ;variables para almacenar el contenido de la integral
+    ;variables para almacenar el contenido de la integral
+    valInt1 db 0d   
     valInt2 db 0d
     valInt3 db 0d
     valInt4 db 0d
     valInt5 db 0d
     valInt6 db 0d
 
-    ;almacenadores
+    ; Variables temporales de unidades
     decenas db 0
     unidades db 0
     numTmp db 0d
     signoTmp db 0
     
-    msgAdvertenciaNegativo db "*******************************",0ah, 
-        "No puede ingresar una opcion negativa",0ah,
-        "Intente nuevamente...",0ah,
-        "*******************************",0ah,0ah,'$'
-
-    msgAdvertenciaSalto db "*******************************",0ah, 
-        "Ingrese una opcion valida",0ah,
-        "Intente nuevamente...",0ah,
-        "*******************************",0ah,0ah,'$'
-    
     msgInterrupcion db 'Presiona enter para continuar','$'
 
     ;Mensajes de informacion
     mensageDerivada db "**************** DERIVADA ***************",0ah,'$'
-    mensajeIntegral db "**************** DERIVADA ***************",0ah,'$'
+    mensajeIntegral db "**************** INTEGRAL ***************",0ah,'$'
     separador db "*******************************",0ah,'$'
     
     indicador db "consola>", '$'
     pivoteCoeficiente db "5",'$' ; para indicar que coeficiente se ingresa
-    msgCoeficiente db "Ingresa el valor del coeficiente para x^",'$'
+    msgCoeficiente db "Coeficiente de x^",'$'
     saltoLinea db " ",0ah,'$'
     espacio db " ",'$'
     parA db "(",'$'
@@ -82,7 +73,6 @@ include macros.asm
     error2       db 10,10,13,"Error: No se acepta caracteres vacios",10,10,13,'$'
     error3       db 10,10,13,"Error: Solo se aceptan digitos entre -9 a +9",10,10,13,'$'
     error4       db 10,10,13,"Error: caracter no reconocido",10,10,13,'$'
-
 
 
     
@@ -111,10 +101,6 @@ include macros.asm
         push OFFSET saltoLinea
         call sout
 
-        cmp al,'-'               ; comprueba si es el signo es menos
-        je  es_negativo
-        cmp al,13                ; comprueba si es el carácter de nueva línea
-        je  es_salto 
         cmp al,'1'               ; comprueba si es uno
         je ingresarCoeficientes
         cmp al,'2'
@@ -131,7 +117,7 @@ include macros.asm
         je  metodoSteffensen
         cmp al, '8'
         je  exit
-        ;jmp invalidOption
+        jmp invalidOption
         
         call InterrupcionEnter
         jmp menuPrincipal
@@ -141,17 +127,20 @@ ingresarCoeficientes:
     call LimpiarConsola
     call ingEcuacion
     call InterrupcionEnter
-
     jmp menuPrincipal
+
 imprimirFuncion:
     call mostrarEcuacion
     jmp menuPrincipal
+
 imprimirDerivada:
     call calcularDerivada
     jmp menuPrincipal
+
 imprimirIntegral:
     call calcularIntegral
     jmp menuPrincipal
+
 graficarFuncion:     
                         push OFFSET aviso
                         call soutln
@@ -171,32 +160,44 @@ exit:
                          mov             ah, 4ch
                          int             21h
 
-    invalidOption:       
-                         print           error1
-                         jmp             menuPrincipal
+invalidOption:       
+                        push OFFSET            error1
+                        call soutln
+                        call InterrupcionEnter
+                        jmp             menuPrincipal
 
-    errorChar:           
-                         print           error4
-                         jmp             menuPrincipal
-es_salto:           
-    mov ah,9
-    mov dx,offset msgAdvertenciaSalto
-    int 21h
+errorChar:           
+                        print           error4
+                        jmp             menuPrincipal
 
-    call InterrupcionEnter
+; Procedimientos
+LimpiarConsola PROC
+    mov ah,0Fh
+    INT 10h
+    mov ah,0
+    INT 10h
+    ret
+LimpiarConsola ENDP
 
-    jmp menuPrincipal
+InterrupcionEnter PROC
 
-es_negativo:   
-    push OFFSET msgAdvertenciaNegativo
+    push offset separador
     call soutln
 
-    call InterrupcionEnter
+    push offset msgInterrupcion
+    call soutln
 
-    jmp menuPrincipal
+    push offset separador
+    call soutln
 
+    mov ah,1    ;solicitud de 1 caracter
+    int 21h  
+
+    ret
+InterrupcionEnter ENDP
+
+; Procedimiento parecido a la funcion soutln de java la cual imprime con salto de linea
 soutln PROC
-    ;------------------------------------------------------------------------------
     push BP
     mov BP, SP
     push AX
@@ -216,8 +217,8 @@ soutln PROC
     ret 2
 soutln ENDP
 
+; Procedimiento parecido a la funcion soutln de java la cual imprime 
 sout PROC
-    ;------------------------------------------------------------------------------
     push BP
     mov BP, SP
     push AX
@@ -227,7 +228,6 @@ sout PROC
     mov DX, [BP+4]  ;direccion de cadena en memoria en segmento de pila
     int 21h
 
-
     pop DX
     pop AX
     pop BP
@@ -235,6 +235,7 @@ sout PROC
 sout ENDP
 
 ingEcuacion PROC
+
     call ingresoCoeficiente ; primera llamada
     mov al, numTmp ; reasignacion valores
     mov coeficiente1, al
@@ -337,6 +338,7 @@ ingEcuacion PROC
 
     neg1:
         neg coeficiente1
+
     continuar1:
     
     mov si, offset signo2
@@ -394,10 +396,9 @@ ingEcuacion PROC
     ret
 ingEcuacion ENDP
 
-ingresoCoeficiente PROC ;para solicitud del coeficiente y lo vamos a guardar en numTmp
-    ;------------------------------------------------------------------------------
+; Resive la literal del coeficiente y la guarda en numTmp
+ingresoCoeficiente PROC 
 
-    ;solicitud de un coeficiente
     push OFFSET saltoLinea
     call sout
 
@@ -410,12 +411,10 @@ ingresoCoeficiente PROC ;para solicitud del coeficiente y lo vamos a guardar en 
     push OFFSET indicador
     call sout
 
-    ;definiendo su signo
     mov ah, 1
     int 21h 
 
     mov signoTmp,al    
-
 
     ; ;agregando caracter de finalizacion al signo para evitar problemas
     ; mov al, '$'   ; carga el caracter '$' en AL
@@ -459,19 +458,9 @@ mover PROC
 
     ; Escribe el carácter en la cadena de destino
     MOV [DI], AL
+    done:
 
-    ; ; Avanza el puntero de la cadena de destino
-    ; INC DI
-
-    ; ; Avanza el puntero de la cadena de origen
-    ; INC SI
-    ; ; Vuelve al menuPrincipal del bucle
-    ; JMP mov_loop
-
-; Fin del programa
-done:
-
-    ret
+        ret
 mover ENDP
 
 mostrarEcuacion PROC
@@ -483,12 +472,11 @@ mostrarEcuacion PROC
     push OFFSET separador
     call soutln
     
-    ;=============Imprimirneodo: signo(coeficiente_1)x^n 
-        mov si, offset signo1
-        mov al, [si]
-        cmp al,'-'
-        je mostNeg1
-        jne mostPos1
+    mov si, offset signo1
+    mov al, [si]
+    cmp al,'-'
+    je mostNeg1
+    jne mostPos1
 
         mostNeg1:
             push OFFSET simNeg
@@ -535,7 +523,7 @@ mostrarEcuacion PROC
         push OFFSET espacio
         call sout
 
-    ;=============Imprimirneodo: signo(coeficiente_2)x^n 
+    ;=============Imprimiendo: signo(coeficiente_2)x^n 
         mov si, offset signo2
         mov al, [si]
         cmp al,'-'
@@ -588,7 +576,7 @@ mostrarEcuacion PROC
         call sout
 
     
-    ;=============Imprimirneodo: signo(coeficiente_3)x^n 
+    ; Imprimiebdo: signo(coeficiente_3)x^n 
         mov si, offset signo3
         mov al, [si]
         cmp al,'-'
@@ -819,7 +807,7 @@ calcularDerivada PROC
     push OFFSET mensageDerivada
     call soutln
 
-    ;imprimir coeDerivada 1 00000000000000000000000000000000000
+    ;imprimir coeDerivada 1 
     mov al,coeficiente1
     mov bl,5d
     mul bl
@@ -866,7 +854,7 @@ calcularDerivada PROC
         push OFFSET espacio
         call sout
 
-    ;imprimir coeDerivada 2 00000000000000000000000000000000000
+    ;imprimir coeDerivada 2 
     mov al,coeficiente2
     mov bl,4d
     mul bl
@@ -913,7 +901,7 @@ calcularDerivada PROC
         push OFFSET espacio
         call sout
 
-    ;imprimir coeDerivada 3 00000000000000000000000000000000000
+    ;imprimir coeDerivada 3 
     mov al,coeficiente3
     mov bl,3d
     mul bl
@@ -1007,7 +995,7 @@ calcularDerivada PROC
         push OFFSET espacio
         call sout
 
-    ;imprimir coeDerivada 5 00000000000000000000000000000000000
+    ;imprimir coeDerivada 5 
     mov al,coeficiente5
     mov bl,1d
     mul bl
@@ -1072,8 +1060,6 @@ calcularDerivada PROC
         call InterrupcionEnter
 
     ret
-    ;fin
-
 
 calcularDerivada ENDP
 
@@ -1084,8 +1070,6 @@ calcularIntegral PROC
 
     push OFFSET mensajeIntegral
     call soutln
-
-    ;---------------calculo
 
     ;Integral 1 =====================
 
@@ -1496,30 +1480,7 @@ imprimirNumeroAL PROC
     ret
 imprimirNumeroAL ENDP
 
-LimpiarConsola PROC
-    mov ah,0Fh
-    INT 10h
-    mov ah,0
-    INT 10h
-    ret
-LimpiarConsola ENDP
 
-InterrupcionEnter PROC
-
-    push offset separador
-    call soutln
-
-    push offset msgInterrupcion
-    call soutln
-
-    push offset separador
-    call soutln
-
-    mov ah,1    ;solicitud de 1 caracter
-    int 21h  
-
-    ret
-InterrupcionEnter ENDP
 
 
 end menuPrincipal
