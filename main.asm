@@ -64,35 +64,18 @@ include macros.asm
     mensajeIntegral db "**************** DERIVADA ***************",0ah,'$'
     separador db "*******************************",0ah,'$'
     
-    indicador db "consolap>", '$'
-    
-    msgSigno db "ingresa el signo del coeficiente que deseas agregar (+/-)",'$'
-
+    indicador db "consola>", '$'
     pivoteCoeficiente db "5",'$' ; para indicar que coeficiente se ingresa
-
     msgCoeficiente db "Ingresa el valor del coeficiente para x^",'$'
-
     saltoLinea db " ",0ah,'$'
-
     espacio db " ",'$'
-
     parA db "(",'$'
-
     parC db ")",'$'
-
     variable db 'x^','$'
-
-    aviso db '','$'
-
+    aviso db 'Perteneciente a la fase 2','$'
     simPos db '+','$'
     simNeg db '-','$'
-
     constante db 'C','$'
-
-    ;==============Mensajes de la opcion uno=========================
-    msIndicador db "El valor del coeficiente es ",'$'
-
-    msgMayor db "Es mayor",0ah,'$'
 
     ;--------------------------Mensajes de error  --------------------------
     error1       db 10,10,13,"Error: Opcion invalida",10,10,13,'$'
@@ -828,7 +811,675 @@ mostrarEcuacion PROC
 ret 
 mostrarEcuacion ENDP
 
+calcularDerivada PROC
 
+    push OFFSET saltoLinea
+    call sout
+
+    push OFFSET mensageDerivada
+    call soutln
+
+    ;imprimir coeDerivada 1 00000000000000000000000000000000000
+    mov al,coeficiente1
+    mov bl,5d
+    mul bl
+    mov derivada1,al
+
+    mov si, offset signo1
+    mov al, [si]
+    cmp al,'-'
+    je mostNegDer1
+    jne mostPosDer1
+
+        mostNegDer1:
+            push OFFSET simNeg
+            call sout
+
+            mov al,derivada1
+            neg al
+            jmp mostAvDer1
+        
+        mostPosDer1:
+            mov al,derivada1
+
+            push OFFSET simPos
+            call sout
+        
+        mostAvDer1: ;avanzar a uno en mostrar
+
+        push OFFSET parA
+        call sout
+
+        call imprimirNumeroAL
+
+        push OFFSET parC
+        call sout
+
+        mov pivoteCoeficiente,'4'
+
+        push OFFSET variable ;imprimir x 
+        call sout
+
+        push OFFSET pivoteCoeficiente ;imprimir el valor del coeficiente
+        call sout
+
+        push OFFSET espacio
+        call sout
+
+    ;imprimir coeDerivada 2 00000000000000000000000000000000000
+    mov al,coeficiente2
+    mov bl,4d
+    mul bl
+    mov derivada2,al
+
+    mov si, offset signo2
+    mov al, [si]
+    cmp al,'-'
+    je mostNegDer2
+    jne mostPosDer2
+
+        mostNegDer2:
+            push OFFSET simNeg
+            call sout
+
+            mov al,derivada2
+            neg al
+            jmp mostAvDer2
+        
+        mostPosDer2:
+            mov al,derivada2
+
+            push OFFSET simPos
+            call sout
+        
+        mostAvDer2: ;avanzar a uno en mostrar
+
+        push OFFSET parA
+        call sout
+
+        call imprimirNumeroAL
+
+        push OFFSET parC
+        call sout
+
+        mov pivoteCoeficiente,'3'
+
+        push OFFSET variable ;imprimir x 
+        call sout
+
+        push OFFSET pivoteCoeficiente ;imprimir el valor del coeficiente
+        call sout
+
+        push OFFSET espacio
+        call sout
+
+    ;imprimir coeDerivada 3 00000000000000000000000000000000000
+    mov al,coeficiente3
+    mov bl,3d
+    mul bl
+    mov derivada3,al
+
+    mov si, offset signo3
+    mov al, [si]
+    cmp al,'-'
+    je mostNegDer3
+    jne mostPosDer3
+
+        mostNegDer3:
+            push OFFSET simNeg
+            call sout
+
+            mov al,derivada3
+            neg al
+            jmp mostAvDer3
+        
+        mostPosDer3:
+            mov al,derivada3
+
+            push OFFSET simPos
+            call sout
+        
+        mostAvDer3: ;avanzar a uno en mostrar
+
+        push OFFSET parA
+        call sout
+
+        call imprimirNumeroAL
+
+        push OFFSET parC
+        call sout
+
+        mov pivoteCoeficiente,'2'
+
+        push OFFSET variable ;imprimir x 
+        call sout
+
+        push OFFSET pivoteCoeficiente ;imprimir el valor del coeficiente
+        call sout
+
+        push OFFSET espacio
+        call sout
+
+    ;imprimir coeDerivada 4
+    mov al,coeficiente4
+    mov bl,2d
+    mul bl
+    mov derivada4,al
+
+    mov si, offset signo4
+    mov al, [si]
+    cmp al,'-'
+    je mostNegDer4
+    jne mostPosDer4
+
+        mostNegDer4:
+            push OFFSET simNeg
+            call sout
+
+            mov al,derivada4
+            neg al
+            jmp mostAvDer4
+        
+        mostPosDer4:
+            mov al,derivada4
+
+            push OFFSET simPos
+            call sout
+        
+        mostAvDer4: ;avanzar a uno en mostrar
+
+        push OFFSET parA
+        call sout
+
+        call imprimirNumeroAL
+
+        push OFFSET parC
+        call sout
+
+        mov pivoteCoeficiente,'1'
+
+        push OFFSET variable ;imprimir x 
+        call sout
+
+        push OFFSET pivoteCoeficiente ;imprimir el valor del coeficiente
+        call sout
+
+        push OFFSET espacio
+        call sout
+
+    ;imprimir coeDerivada 5 00000000000000000000000000000000000
+    mov al,coeficiente5
+    mov bl,1d
+    mul bl
+    mov derivada5,al
+
+    mov si, offset signo5
+    mov al, [si]
+    cmp al,'-'
+    je mostNegDer5
+    jne mostPosDer5
+
+        mostNegDer5:
+            push OFFSET simNeg
+            call sout
+
+            mov al,derivada5
+            neg al
+            jmp mostAvDer5
+        
+        mostPosDer5:
+            mov al,derivada5
+
+            push OFFSET simPos
+            call sout
+        
+        mostAvDer5: ;avanzar a uno en mostrar
+
+        push OFFSET parA
+        call sout
+
+        call imprimirNumeroAL
+
+        push OFFSET parC
+        call sout
+
+        mov pivoteCoeficiente,'0'
+
+        push OFFSET variable ;imprimir x 
+        call sout
+
+        push OFFSET pivoteCoeficiente ;imprimir el valor del coeficiente
+        call sout
+
+        push OFFSET espacio
+        call sout
+
+        ;==================End
+
+
+        push OFFSET saltoLinea
+        call sout
+
+        push OFFSET saltoLinea
+        call sout
+
+        push OFFSET separador
+        call soutln
+
+        mov pivoteCoeficiente,'5'
+
+        ;salto de linea final ================
+        call InterrupcionEnter
+
+    ret
+    ;fin
+
+
+calcularDerivada ENDP
+
+calcularIntegral PROC
+
+    push OFFSET saltoLinea
+    call sout
+
+    push OFFSET mensajeIntegral
+    call soutln
+
+    ;---------------calculo
+
+    ;Integral 1 =====================
+
+        ;validar si es negativo para realizar la negacion para imprimir
+        mov si, offset signo1
+        mov al, [si]
+        cmp al,'-'
+        je mostNegInt1
+        jne mostPosInt1
+
+            mostNegInt1:
+
+                xor ax,ax   ;reiniciar el registro
+                xor bx,bx   ;reiniciar el registro
+                mov al,coeficiente1 ;mover el contenido del coeficiente a la parte baja del registro
+                neg al      ;se niega para poder realizar la division
+                
+                mov bl,6d   ;mover el divisor a la parte baja de BX
+                idiv bl     ;realizar la division
+                mov valInt1,al  ;realizar la division y asignar el valor a la variable
+
+                push OFFSET simNeg
+                call sout
+
+                mov al,valInt1
+                jmp mostAvInt1
+            
+            mostPosInt1:
+                xor ax,ax   
+                xor bx,bx  
+            
+                mov al,coeficiente1 
+                mov bl,6d   
+                div bl
+                mov valInt1,al
+
+                mov al,valInt1
+
+                push OFFSET simPos
+                call sout
+            
+            mostAvInt1: ;avanzar a uno en mostrar
+
+            push OFFSET parA
+            call sout
+
+            call imprimirNumeroAL   ;en este punto el numero esta en al
+
+            push OFFSET parC
+            call sout
+
+            mov pivoteCoeficiente,'6'
+
+            push OFFSET variable ;imprimir x 
+            call sout
+
+            push OFFSET pivoteCoeficiente ;imprimir el valor del coeficiente
+            call sout
+
+            push OFFSET espacio
+            call sout
+
+    ;Integral 2 =====================
+
+        ;validar si es negativo para realizar la negacion para imprimir
+        mov si, offset signo2
+        mov al, [si]
+        cmp al,'-'
+        je mostNegInt2
+        jne mostPosInt2
+
+            mostNegInt2:
+
+                xor ax,ax   ;reiniciar el registro
+                xor bx,bx   ;reiniciar el registro
+                mov al,coeficiente2 ;mover el contenido del coeficiente a la parte baja del registro
+                neg al      ;se niega para poder realizar la division
+                
+                mov bl,5d   ;mover el divisor a la parte baja de BX
+                idiv bl     ;realizar la division
+                mov valInt2,al  ;realizar la division y asignar el valor a la variable
+
+                push OFFSET simNeg
+                call sout
+
+                mov al,valInt2
+                jmp mostAvInt2
+            
+            mostPosInt2:
+                xor ax,ax   
+                xor bx,bx  
+            
+                mov al,coeficiente2 
+                mov bl,5d   
+                div bl
+                mov valInt2,al
+
+                mov al,valInt2
+
+                push OFFSET simPos
+                call sout
+            
+            mostAvInt2: ;avanzar a uno en mostrar
+
+            push OFFSET parA
+            call sout
+
+            call imprimirNumeroAL   ;en este punto el numero esta en al
+
+            push OFFSET parC
+            call sout
+
+            mov pivoteCoeficiente,'5'
+
+            push OFFSET variable ;imprimir x 
+            call sout
+
+            push OFFSET pivoteCoeficiente ;imprimir el valor del coeficiente
+            call sout
+
+            push OFFSET espacio
+            call sout
+
+    ;Integral 3 =====================
+
+        ;validar si es negativo para realizar la negacion para imprimir
+        mov si, offset signo3
+        mov al, [si]
+        cmp al,'-'
+        je mostNegInt3
+        jne mostPosInt3
+
+            mostNegInt3:
+
+                xor ax,ax   ;reiniciar el registro
+                xor bx,bx   ;reiniciar el registro
+                mov al,coeficiente3 ;mover el contenido del coeficiente a la parte baja del registro
+                neg al      ;se niega para poder realizar la division
+                
+                mov bl,4d   ;mover el divisor a la parte baja de BX
+                idiv bl     ;realizar la division
+                mov valInt3,al  ;realizar la division y asignar el valor a la variable
+
+                push OFFSET simNeg
+                call sout
+
+                mov al,valInt3
+                jmp mostAvInt3
+            
+            mostPosInt3:
+                xor ax,ax   
+                xor bx,bx  
+            
+                mov al,coeficiente3 
+                mov bl,4d   
+                div bl
+                mov valInt3,al
+
+                mov al,valInt3
+
+                push OFFSET simPos
+                call sout
+            
+            
+            mostAvInt3: ;avanzar a uno en mostrar
+
+            push OFFSET parA
+            call sout
+
+            call imprimirNumeroAL   ;en este punto el numero esta en al
+
+            push OFFSET parC
+            call sout
+
+            mov pivoteCoeficiente,'4'
+
+            push OFFSET variable ;imprimir x 
+            call sout
+
+            push OFFSET pivoteCoeficiente ;imprimir el valor del coeficiente
+            call sout
+
+            push OFFSET espacio
+            call sout
+        
+    ;Integral 4 =====================
+
+        ;validar si es negativo para realizar la negacion para imprimir
+        mov si, offset signo4
+        mov al, [si]
+        cmp al,'-'
+        je mostNegInt4
+        jne mostPosInt4
+
+            mostNegInt4:
+
+                xor ax,ax   ;reiniciar el registro
+                xor bx,bx   ;reiniciar el registro
+                mov al,coeficiente4 ;mover el contenido del coeficiente a la parte baja del registro
+                neg al      ;se niega para poder realizar la division
+                
+                mov bl,3d   ;mover el divisor a la parte baja de BX
+                idiv bl     ;realizar la division
+                mov valInt4,al  ;realizar la division y asignar el valor a la variable
+
+                push OFFSET simNeg
+                call sout
+
+                mov al,valInt4
+                jmp mostAvInt4
+            
+            mostPosInt4:
+                xor ax,ax   
+                xor bx,bx  
+            
+                mov al,coeficiente4 
+                mov bl,3d   
+                div bl
+                mov valInt4,al
+
+                mov al,valInt4
+
+                push OFFSET simPos
+                call sout
+
+            mostAvInt4: ;avanzar a uno en mostrar
+
+            push OFFSET parA
+            call sout
+
+            call imprimirNumeroAL   ;en este punto el numero esta en al
+
+            push OFFSET parC
+            call sout
+
+            mov pivoteCoeficiente,'3'
+
+            push OFFSET variable ;imprimir x 
+            call sout
+
+            push OFFSET pivoteCoeficiente ;imprimir el valor del coeficiente
+            call sout
+
+            push OFFSET espacio
+            call sout
+
+    ;Integral 5 =====================
+
+        ;validar si es negativo para realizar la negacion para imprimir
+        mov si, offset signo5
+        mov al, [si]
+        cmp al,'-'
+        je mostNegInt5
+        jne mostPosInt5
+
+            mostNegInt5:
+
+                xor ax,ax   ;reiniciar el registro
+                xor bx,bx   ;reiniciar el registro
+                mov al,coeficiente5 ;mover el contenido del coeficiente a la parte baja del registro
+                neg al      ;se niega para poder realizar la division
+                
+                mov bl,2d   ;mover el divisor a la parte baja de BX
+                idiv bl     ;realizar la division
+                mov valInt5,al  ;realizar la division y asignar el valor a la variable
+
+                push OFFSET simNeg
+                call sout
+
+                mov al,valInt5
+                jmp mostAvInt5
+            
+            mostPosInt5:
+                xor ax,ax   
+                xor bx,bx  
+            
+                mov al,coeficiente5
+                mov bl,2d   
+                div bl
+                mov valInt5,al
+
+                mov al,valInt5
+
+                push OFFSET simPos
+                call sout
+            
+            mostAvInt5: ;avanzar a uno en mostrar
+
+            push OFFSET parA
+            call sout
+
+            call imprimirNumeroAL   ;en este punto el numero esta en al
+
+            push OFFSET parC
+            call sout
+
+            mov pivoteCoeficiente,'2'
+
+            push OFFSET variable ;imprimir x 
+            call sout
+
+            push OFFSET pivoteCoeficiente ;imprimir el valor del coeficiente
+            call sout
+
+            push OFFSET espacio
+            call sout
+
+    ;Integral 6 =====================
+
+        ;validar si es negativo para realizar la negacion para imprimir
+        mov si, offset signo6
+        mov al, [si]
+        cmp al,'-'
+        je mostNegInt6
+        jne mostPosInt6
+
+            mostNegInt6:
+
+                xor ax,ax   ;reiniciar el registro
+                xor bx,bx   ;reiniciar el registro
+                mov al,coeficiente6 ;mover el contenido del coeficiente a la parte baja del registro
+                neg al      ;se niega para poder realizar la division
+                
+                mov bl,1d   ;mover el divisor a la parte baja de BX
+                idiv bl     ;realizar la division
+                mov valInt6,al  ;realizar la division y asignar el valor a la variable
+
+                push OFFSET simNeg
+                call sout
+
+                mov al,valInt6
+                jmp mostAvInt6
+            
+            mostPosInt6:
+                xor ax,ax   
+                xor bx,bx  
+            
+                mov al,coeficiente6 
+                mov bl,1d   
+                div bl
+                mov valInt6,al
+
+                mov al,valInt6
+
+                push OFFSET simPos
+                call sout
+            
+            mostAvInt6: ;avanzar a uno en mostrar
+
+            push OFFSET parA
+            call sout
+
+            call imprimirNumeroAL   ;en este punto el numero esta en al
+
+            push OFFSET parC
+            call sout
+
+            mov pivoteCoeficiente,'1'
+
+            push OFFSET variable ;imprimir x 
+            call sout
+
+            push OFFSET pivoteCoeficiente ;imprimir el valor del coeficiente
+            call sout
+
+            push OFFSET espacio
+            call sout
+
+    ;Imprimir constante ================
+
+        push OFFSET simPos
+        call sout
+
+        push OFFSET constante
+        call sout
+
+    ;---------------fin calculo
+
+        push OFFSET saltoLinea
+        call sout
+
+        push OFFSET saltoLinea
+        call sout
+
+        push OFFSET separador
+        call soutln
+
+        mov pivoteCoeficiente,'5'
+
+        ;salto de linea final ================
+        call InterrupcionEnter
+
+    ret
+calcularIntegral ENDP
 
 imprimirNumeroAL PROC
     AAM
@@ -844,82 +1495,6 @@ imprimirNumeroAL PROC
     int 21h
     ret
 imprimirNumeroAL ENDP
-
-mostrarC1 PROC
-
-    push OFFSET saltoLinea
-    call sout
-    
-    push OFFSET separador
-    call sout
-
-    ; Utiliza la interrupción 21h para imprimir la cadena de destino
-    mov si, offset signo1
-    mov dx, [si]
-    mov ah, 02h
-    int 21h
-    ;fin >>>>>>>>
-
-    push OFFSET parA
-    call sout
-
-    
-    mov al,coeficiente1 ;imprimir el numero
-    AAM
-    mov bx,ax
-    mov ah,02h
-    mov dl,bh
-    add dl,30h
-    int 21h
-
-    mov ah, 02h
-    mov dl,bl
-    add dl,30h
-    int 21h
-
-    push OFFSET parC
-    call sout
-
-    ;coeficiente2
-    mov ah, 09h
-    mov dx, offset signo2[0]
-    int 21h
-
-    push OFFSET parA
-    call sout
-
-    
-
-    mov al,coeficiente2 ;imprimir el numero
-    AAM
-    mov bx,ax
-    mov ah,02h
-    mov dl,bh
-    add dl,30h
-    int 21h
-
-    mov ah, 02h
-    mov dl,bl
-    add dl,30h
-    int 21h
-
-    push OFFSET parC
-    call sout
-    ;FIN============================
-
-    push OFFSET saltoLinea
-    call sout
-    push OFFSET separador
-    call sout
-
-ret
-mostrarC1 ENDP
-
-banderazo PROC
-    push OFFSET  aviso
-    call soutln
-    ret
-banderazo ENDP
 
 LimpiarConsola PROC
     mov ah,0Fh
