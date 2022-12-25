@@ -95,7 +95,7 @@ include macros.asm
         call sout
 
         ;Menu
-        mov ah,01h    ;solicitud de 1 caracter
+        mov ah,01h 
         int 21h  
         
         push OFFSET saltoLinea
