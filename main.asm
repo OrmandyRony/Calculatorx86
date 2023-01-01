@@ -391,10 +391,18 @@ PintarPlano macro
         inc si
         jmp pintaryll
     salir:
-        jmp G1
-
+        cmp flag_normal,1
+            je G1
+        cmp flag_derivada,1
+            je G2
+        cmp flag_integral,1
+            je G3
     G1:
-        GraficarNormal    
+        GraficarNormal
+    G2:
+        GraficarDerivada
+    G3:
+        GraficarIntegral  
 endm
 
 EvaluarIntervalo macro
@@ -470,7 +478,7 @@ GraficarDerivada macro
         mul bx   ; x*x*x
         mul bx   ; x*x*x*x
         xor bx,bx
-        mov bx,derivada4
+        mov bx,derivada5
         mul bx       ; coeficiente * x4
         mov result,ax
     PosX3: ;x3
@@ -481,7 +489,7 @@ GraficarDerivada macro
         mul bx
         mul bx
         xor bx,bx
-        mov bx,coeficiente3
+        mov bx,derivada4
         mul bx
         add ax,result
         mov result,ax
@@ -492,7 +500,7 @@ GraficarDerivada macro
         mov bx,posx
         mul bx
         xor bx,bx
-        mov bx,coeficiente2
+        mov bx,derivada3
         mul bx
         add ax,result
         mov result,ax
@@ -501,14 +509,14 @@ GraficarDerivada macro
         xor bx,bx
         mov ax,posx
         xor bx,bx
-        mov bx,coeficiente1
+        mov bx,derivada2
         mul bx
         add ax,result
         mov result,ax
     
     PosX6:   ; coeficiente 0 solo se suma 
         xor ax,ax
-        mov ax,coeficiente0
+        mov ax,derivada1
         add ax,result
         mov result,ax
         add ax,0
@@ -714,6 +722,151 @@ GraficarNormal macro
 
 endm
 
+; Grafica la integral
+GraficarIntegral macro
+    LOCAL Grafica,PosXX,PosX1,PosX2,PosX3,PosX4,PosX5,PosX6,Positivo,negativo,Fin
+    Grafica:
+        mov result, 0
+        xor ax,ax
+        
+        mov ax,iniX ;paso el intervalo inicial
+        mov posx,ax ; a posicion x
+        xor ax,ax   ;se limpia ax
+        xor si,si
+        mov ax,finX ;paso intervalo final 
+        mov si,ax   ;a si
+        inc si      ;y se incrementa
+        xor di,di
+    PosXX:
+        cmp posx,si
+            je Fin
+        jmp PosX1
+
+    PosX1:  ;para x4
+        xor ax,ax
+        xor bx,bx
+
+        mov ax,posx
+        mov bx,posx
+
+        mul bx   ; x *x
+        mul bx   ; x*x*x
+        mul bx   ; x*x*x*x
+        mul bx   ; x*x*x*x*x
+        xor bx,bx
+        mov bx,coeficiente5
+        mul bx       ; coeficiente * x5
+        mov result,ax
+    PosX2:  ;para x4
+        xor ax,ax
+        xor bx,bx
+
+        mov ax,posx
+        mov bx,posx
+
+        mul bx   ; x *x
+        mul bx   ; x*x*x
+        mul bx   ; x*x*x*x
+        xor bx,bx
+        mov bx,coeficiente4
+        mul bx       ; coeficiente * x4
+        mov result,ax
+    PosX3: ;x3
+        xor ax,ax
+        xor bx,bx
+        mov ax,posx
+        mov bx,posx
+        mul bx
+        mul bx
+        xor bx,bx
+        mov bx,coeficiente3
+        mul bx
+        add ax,result
+        mov result,ax
+    PosX4:   ;x2
+        xor ax,ax
+        xor bx,bx
+        mov ax,posx
+        mov bx,posx
+        mul bx
+        xor bx,bx
+        mov bx,coeficiente2
+        mul bx
+        add ax,result
+        mov result,ax
+    PosX5: ;x1
+        xor ax,ax
+        xor bx,bx
+        mov ax,posx
+        xor bx,bx
+        mov bx,coeficiente1
+        mul bx
+        add ax,result
+        mov result,ax
+    
+    PosX6:   ; coeficiente 0 solo se suma 
+        xor ax,ax
+        mov ax,coeficiente0
+        add ax,result
+        mov result,ax
+        add ax,0
+        js negativo
+        jmp Positivo
+    Positivo:
+        inc posx
+        mov bx,result
+        cmp bx,99
+            ja PosXX
+        xor ax,ax
+        mov ax,99
+        sub ax,bx
+
+        mov posy,ax
+        mov cx,posx
+        dec cx
+        add cx,150
+        pintar cx,posy,15
+
+        inc cx
+        xor ax,ax
+        xor bx,bx
+        mov ax,result
+
+        jmp PosXX
+    
+    negativo:
+        inc posx
+        mov bx,result
+        neg bx
+        cmp bx,99
+            ja PosXX
+
+        xor ax,ax
+        mov ax,99
+        add ax,bx
+        inc ax
+        mov posy,ax
+        
+        mov cx,posx
+        dec cx
+        add cx,150
+        
+        pintar cx,posy,15
+
+        xor ax,ax
+        xor bx,bx
+        jmp PosXX
+    Fin:
+        getChar
+        mov ah,00h
+        mov al,03h
+        int 10h
+        
+        jmp menuPrincipal
+
+endm
+
+
 .model small
 .stack
 .386
@@ -724,9 +877,9 @@ endm
                  db '(2) Imprimir la funcion almacenada',10,13
                  db '(3) Imprimir derivada de la funcion almacenada',10,13
                  db '(4) Imprimir integral de la funcion almacenada',10,13
-                 db '(5) Graficar la funcion',10,13
-                 db '(6) Metodo Newton',10,13
-                 db '(7) Metodo de Steffensen',10,13
+                 db '(5) Graficar la funcion original',10,13
+                 db '(6) Graficar la funcion derivada',10,13
+                 db '(7) Graficar la funcion integral',10,13
                  db '(8) Salir de la aplicacion',10,13,'$'
     
     msgCoeficiente5 db "Ingrece coeficiente para X^5: $"
@@ -757,6 +910,10 @@ endm
     msjerror2 db '<< Error el intervalo inicial es mayor al final ',13,10,"$"
     intervaloini db 'Ingrese el valor inicial del intervalo: $',10
     intervalofin db 'Ingrese el valor final del intervalo: $',13,10
+
+    flag_normal dw 0
+    flag_derivada dw 0
+    flag_integral dw 0
 ;----------------para intervalos----------------
 iniX dw 0
 finX dw 10
@@ -811,7 +968,8 @@ result dw 0
     menuPrincipal:
         mov ax,@data
         mov ds,ax
-
+         mov flag_derivada,0
+         mov flag_normal,0
         call LimpiarConsola
 
         push OFFSET saltoLinea
@@ -839,6 +997,10 @@ result dw 0
         je imprimirIntegral
         cmp al, '5'
         je  graficarFuncion
+        cmp al, '6'
+        je  graficarFuncionDerivada
+        cmp al, '7'
+        je  graficarFuncionIntegral
         cmp al, '8'
         je  exit
         jmp invalidOption
@@ -999,6 +1161,19 @@ exit:
                          mov             ah, 4ch
                          int             21h
 graficarFuncion:     
+                        mov flag_normal,1
+                        PedirInicial
+                        InterrupcionEnter
+                        jmp             menuPrincipal
+
+graficarFuncionDerivada:
+                        mov flag_derivada,1
+                        PedirInicial
+                        InterrupcionEnter
+                        jmp             menuPrincipal
+
+graficarFuncionIntegral:
+                        mov flag_integral,1    
                         PedirInicial
                         InterrupcionEnter
                         jmp             menuPrincipal
