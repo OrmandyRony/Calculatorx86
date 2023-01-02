@@ -724,7 +724,7 @@ endm
 
 ; Grafica la integral
 GraficarIntegral macro
-    LOCAL Grafica,PosXX,PosX1,PosX2,PosX3,PosX4,PosX5,PosX6,Positivo,negativo,Fin
+    LOCAL Grafica,PosXX,PosX0,PosX1,PosX2,PosX3,PosX4,PosX5,PosX6,Positivo,negativo,Fin
     Grafica:
         mov result, 0
         xor ax,ax
@@ -742,7 +742,8 @@ GraficarIntegral macro
             je Fin
         jmp PosX1
 
-    PosX1:  ;para x4
+
+    PosX1:  ;para x5
         xor ax,ax
         xor bx,bx
 
@@ -753,9 +754,10 @@ GraficarIntegral macro
         mul bx   ; x*x*x
         mul bx   ; x*x*x*x
         mul bx   ; x*x*x*x*x
+        mul bx   ; x*x*x*x*x*x
         xor bx,bx
-        mov bx,coeficiente5
-        mul bx       ; coeficiente * x5
+        mov bx,coeficienteIntegral5
+        mul bx       ; coeficiente * x6
         mov result,ax
     PosX2:  ;para x4
         xor ax,ax
@@ -767,19 +769,21 @@ GraficarIntegral macro
         mul bx   ; x *x
         mul bx   ; x*x*x
         mul bx   ; x*x*x*x
+        mul bx   ; x*x*x*x*x
         xor bx,bx
-        mov bx,coeficiente4
-        mul bx       ; coeficiente * x4
+        mov bx,coeficienteIntegral4
+        mul bx       ; coeficiente * x5
         mov result,ax
     PosX3: ;x3
         xor ax,ax
         xor bx,bx
         mov ax,posx
         mov bx,posx
-        mul bx
-        mul bx
+        mul bx  ; x*x
+        mul bx  ; x*x*x
+        mul bx  ; x*x*x*x
         xor bx,bx
-        mov bx,coeficiente3
+        mov bx,coeficienteIntegral3
         mul bx
         add ax,result
         mov result,ax
@@ -788,9 +792,10 @@ GraficarIntegral macro
         xor bx,bx
         mov ax,posx
         mov bx,posx
-        mul bx
+        mul bx ; x * x
+        mul bx ; x * x *x
         xor bx,bx
-        mov bx,coeficiente2
+        mov bx,coeficienteIntegral2
         mul bx
         add ax,result
         mov result,ax
@@ -798,15 +803,21 @@ GraficarIntegral macro
         xor ax,ax
         xor bx,bx
         mov ax,posx
+        mov bx, posx
+        mul bx
         xor bx,bx
-        mov bx,coeficiente1
+        mov bx,coeficienteIntegral1
         mul bx
         add ax,result
         mov result,ax
     
     PosX6:   ; coeficiente 0 solo se suma 
         xor ax,ax
-        mov ax,coeficiente0
+        xor bx,bx
+        mov ax,posx
+        xor bx,bx
+        mov bx,coeficienteIntegral0
+        mul bx
         add ax,result
         mov result,ax
         add ax,0
@@ -970,6 +981,7 @@ result dw 0
         mov ds,ax
          mov flag_derivada,0
          mov flag_normal,0
+         mov flag_integral,1
         call LimpiarConsola
 
         push OFFSET saltoLinea
@@ -1239,11 +1251,11 @@ calcularIntegral PROC
     mov coeficienteIntegral0, ax
 
     ;Integral coeficiente1 /2
-    mov ax, coeficiente1
+    mov ax, coeficiente1 ;x^1
     mov bx, 2
     mov dx, 0
     div bx
-    mov coeficienteIntegral1, ax
+    mov coeficienteIntegral1, ax ;x^2
 
     ;Integral coeficiente2 /3
     mov ax, coeficiente2
@@ -1296,7 +1308,7 @@ imprimirEcuacionIntegral proc
         mov val, ax
         call printNumber
         mov ah, 09h
-        mov dx, offset exponente5
+        mov dx, offset exponente6
         int 21h
 
     ;imprimir coeficiente integral 4
@@ -1315,7 +1327,7 @@ imprimirEcuacionIntegral proc
         mov val, ax
         call printNumber
         mov ah, 09h
-        mov dx, offset exponente4
+        mov dx, offset exponente5
         int 21h
 
     ;imprimir coeficiente integral 3
@@ -1334,7 +1346,7 @@ imprimirEcuacionIntegral proc
         mov val, ax
         call printNumber
         mov ah, 09h
-        mov dx, offset exponente3
+        mov dx, offset exponente4
         int 21h
 
     ;imprimir coeficiente integral 2
@@ -1353,7 +1365,7 @@ imprimirEcuacionIntegral proc
         mov val, ax
         call printNumber
         mov ah, 09h
-        mov dx, offset exponente2
+        mov dx, offset exponente3
         int 21h
     
     ;imprimir coeficiente integral 1
@@ -1372,7 +1384,7 @@ imprimirEcuacionIntegral proc
         mov val, ax
         call printNumber
         mov ah, 09h
-        mov dx, offset exponente1
+        mov dx, offset exponente2
         int 21h
     
     ;imprimir coeficiente integral 0
@@ -1391,7 +1403,7 @@ imprimirEcuacionIntegral proc
         mov val, ax
         call printNumber
         mov ah, 09h
-        mov dx, offset exponente0
+        mov dx, offset exponente1
         int 21h
 
         mov ah, 09h
@@ -1497,7 +1509,7 @@ imprimirEcuacionDerivada proc
         mov val, ax
         call printNumber
         mov ah, 09h
-        mov dx, offset exponente1
+        mov dx, offset exponente0
         int 21h
     ret
 
